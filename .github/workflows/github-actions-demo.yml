@@ -1,25 +1,33 @@
 name: CI-Firebase-hosting
 description: 'Upload a node based frontend framework generated projects(React/Angular/VueJS) to the firebase hosting.'
-author: 'Danushka Herath'
+author: 'mnv'
 
 on:
   push:
     branches:
       - master
+# ...
 
 jobs:
-  firebase-deploy:
+  buildAndDeploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
+      - uses: actions/checkout@v3
+
+      # You need to setup node before using the action
+      - uses: actions/setup-node@v3
         with:
-          node-version: '10.x'
-      - run: npm install
-      - run: npm run build
-      - uses: w9jds/firebase-action@master
+          node-version: 18.x
+          cache: npm
+
+      # Add any steps. For example:
+      # - run: npm ci && npm build
+
+      - uses: pchmn/firebase-cli-github-action@main
         with:
+          serviceAccountKey: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          projectId: testgithubci-b4476
+          # args: deploy --only functions
+          # or:
           args: deploy --only hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          # args: deploy --only firestore:rules
